@@ -164,7 +164,7 @@ function toggleTimer() {
   } else {
     state = startTimer(state, Date.now());
     stopInterval();
-    intervalId = window.setInterval(tick, 250);
+    intervalId = window.setInterval(tick, 1000);
   }
 
   render();

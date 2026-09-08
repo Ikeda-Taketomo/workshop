@@ -25,6 +25,10 @@ func newHandler(webDir string) http.Handler {
 			http.NotFound(writer, request)
 			return
 		}
+		if request.Method != http.MethodGet && request.Method != http.MethodHead {
+			writer.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
 
 		http.ServeFile(writer, request, webDir+"/index.html")
 	})
