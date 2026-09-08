@@ -39,6 +39,30 @@ func TestNewHandlerHealthzRejectsNonGet(t *testing.T) {
 	}
 }
 
+func TestNewHandlerRootRejectsMethodsOtherThanGetAndHead(t *testing.T) {
+	handler := newHandler("web")
+	request := httptest.NewRequest(http.MethodPost, "/", nil)
+	recorder := httptest.NewRecorder()
+
+	handler.ServeHTTP(recorder, request)
+
+	if recorder.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("status = %d, want %d", recorder.Code, http.StatusMethodNotAllowed)
+	}
+}
+
+func TestNewHandlerRootAllowsHead(t *testing.T) {
+	handler := newHandler("web")
+	request := httptest.NewRequest(http.MethodHead, "/", nil)
+	recorder := httptest.NewRecorder()
+
+	handler.ServeHTTP(recorder, request)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", recorder.Code, http.StatusOK)
+	}
+}
+
 func TestNewHandlerServesWebFiles(t *testing.T) {
 	handler := newHandler("web")
 

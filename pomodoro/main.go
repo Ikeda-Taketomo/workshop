@@ -21,6 +21,11 @@ func newHandler(webDir string) http.Handler {
 	})
 
 	mux.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != http.MethodGet && request.Method != http.MethodHead {
+			writer.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		if request.URL.Path != "/" {
 			http.NotFound(writer, request)
 			return
