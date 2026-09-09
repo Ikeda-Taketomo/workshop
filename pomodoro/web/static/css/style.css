@@ -64,14 +64,9 @@ body {
   animation: ambient-wave 14s ease-in-out infinite reverse;
 }
 
-.app-shell.is-focus::before,
-.app-shell.is-focus::after {
-  opacity: 0.32;
-}
-
 .app-shell.is-focus-running::before,
 .app-shell.is-focus-running::after {
-  opacity: 0.48;
+  opacity: 0.34;
 }
 
 .timer-card {
@@ -361,6 +356,15 @@ button {
 
   100% {
     transform: translate(-60%, -66%) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell::before,
+  .app-shell::after,
+  .timer-ring {
+    animation: none;
+    transition: none;
   }
 }
 

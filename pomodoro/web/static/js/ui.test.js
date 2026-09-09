@@ -31,5 +31,7 @@ test("styles define the timer ring and responsive layout", () => {
   assert.match(css, /@property --timer-hue/);
   assert.match(css, /@keyframes ambient-wave/);
   assert.match(css, /\.app-shell\.is-focus-running::before/);
+  assert.doesNotMatch(css, /\.app-shell\.is-focus::before/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
   assert.match(css, /@media \(max-width: 480px\)/);
 });

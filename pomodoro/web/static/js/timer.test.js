@@ -37,7 +37,9 @@ test("calculateProgressDegrees returns the remaining arc of the timer ring", () 
 
 test("calculateTimerHue shifts from blue to yellow to red over time", () => {
   assert.equal(calculateTimerHue(1500, 1500), 210);
+  assert.equal(calculateTimerHue(1125, 1500), 130);
   assert.equal(calculateTimerHue(750, 1500), 50);
+  assert.equal(calculateTimerHue(375, 1500), 28);
   assert.equal(calculateTimerHue(0, 1500), 6);
 });
 

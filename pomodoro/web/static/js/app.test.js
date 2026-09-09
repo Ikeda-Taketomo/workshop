@@ -33,7 +33,7 @@ test("app connects persistence, settings, tasks, history, and notifications", ()
   }
 });
 
-test("app toggles focus ambience classes while the timer is in focus mode", () => {
-  assert.match(app, /is-focus/);
+test("app only toggles the focus ambience class while the focus timer is running", () => {
   assert.match(app, /is-focus-running/);
+  assert.doesNotMatch(app, /classList\.toggle\("is-focus"/);
 });

@@ -69,7 +69,6 @@ function render() {
     button.classList.toggle("is-active", button.dataset.mode === state.mode);
     button.disabled = state.isRunning;
   });
-  appShell?.classList.toggle("is-focus", state.mode === "focus");
   appShell?.classList.toggle("is-focus-running", state.mode === "focus" && state.isRunning);
   updateTimerRing(remainingSeconds);
   renderTasks(taskList);
