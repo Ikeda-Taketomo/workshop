@@ -27,6 +27,51 @@ let intervalId = null;
 let tasks = [];
 let history = [];
 let activeTaskId = null;
+let audioContext = null;
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+}
+
+function getAudioContext() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  if (!audioContext) {
+    audioContext = new AudioContextClass();
+  }
+  return audioContext;
+}
+
+function playTone(frequency, durationMs, oscillatorType, gainValue) {
+  const context = getAudioContext();
+  if (!context) return;
+
+  if (context.state === "suspended") {
+    context.resume().catch(() => {});
+  }
+
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = oscillatorType;
+  oscillator.frequency.value = frequency;
+  gain.gain.value = gainValue;
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.start();
+  oscillator.stop(context.currentTime + durationMs / 1000);
+}
+
+function playSound(kind) {
+  if (!settings.sounds[kind]) return;
+
+  const sounds = {
+    start: () => playTone(880, 90, "sine", 0.035),
+    end: () => playTone(660, 220, "triangle", 0.045),
+    tick: () => playTone(520, 30, "square", 0.012),
+  };
+
+  sounds[kind]?.();
+}
 
 function getRemainingSeconds(nowMs = Date.now()) {
   if (!state.isRunning || state.startedAtMs === null) {
@@ -124,6 +169,7 @@ function persistState() {
 }
 
 function notifyCompletion(mode) {
+  playSound("end");
   document.title = `${MODE_LABELS[mode]}が完了しました | ポモドーロタイマー`;
   if ("vibrate" in navigator) navigator.vibrate([120, 80, 120]);
   if ("Notification" in window && Notification.permission === "granted") {
@@ -140,6 +186,7 @@ function stopInterval() {
 
 function tick() {
   if (getRemainingSeconds() > 0) {
+    playSound("tick");
     render();
     return;
   }
@@ -167,6 +214,7 @@ function toggleTimer() {
   } else {
     state = startTimer(state, Date.now());
     stopInterval();
+    playSound("start");
     intervalId = window.setInterval(tick, 1000);
   }
 
@@ -185,30 +233,76 @@ function chooseMode(event) {
   render();
 }
 
-function saveSettings() {
-  const rawSettings = {
+function setSettingsMessage(message, stateName) {
+  const error = document.querySelector("#settings-error");
+  if (!error) return;
+  error.textContent = message;
+  if (stateName) {
+    error.dataset.state = stateName;
+  } else {
+    delete error.dataset.state;
+  }
+}
+
+function readSettingsForm() {
+  return {
     focus: Number(document.querySelector("#focus-duration-input")?.value),
     shortBreak: Number(document.querySelector("#short-break-input")?.value),
     longBreak: Number(document.querySelector("#long-break-input")?.value),
     longBreakInterval: Number(document.querySelector("#long-break-interval-input")?.value),
+    theme: document.querySelector("#theme-input")?.value,
+    sounds: {
+      start: Boolean(document.querySelector("#start-sound-input")?.checked),
+      end: Boolean(document.querySelector("#end-sound-input")?.checked),
+      tick: Boolean(document.querySelector("#tick-sound-input")?.checked),
+    },
   };
-  const error = document.querySelector("#settings-error");
+}
 
-  if (!validateSettings(rawSettings)) {
-    if (error) error.textContent = "1以上の整数で、設定可能な範囲の値を入力してください。";
-    return;
-  }
-
-  settings = {
+function toSettings(rawSettings) {
+  return {
     focus: { durationSeconds: rawSettings.focus * 60 },
     shortBreak: { durationSeconds: rawSettings.shortBreak * 60 },
     longBreak: { durationSeconds: rawSettings.longBreak * 60 },
     longBreakInterval: rawSettings.longBreakInterval,
+    theme: rawSettings.theme,
+    sounds: rawSettings.sounds,
   };
+}
+
+function applySettings(nextSettings, message = "設定を保存しました。") {
+  settings = nextSettings;
+  applyTheme(settings.theme);
   repository.saveSettings(settings);
-  if (error) error.textContent = "保存しました。";
-  if (!state.isRunning) state = resetTimer(state, settings);
+  if (!state.isRunning) {
+    state = resetTimer(state, settings);
+  }
+  setSettingsMessage(message, "success");
   render();
+}
+
+function saveSettings() {
+  const rawSettings = readSettingsForm();
+
+  if (!validateSettings(rawSettings)) {
+    setSettingsMessage("選択肢の中から設定してください。", "error");
+    return;
+  }
+
+  applySettings(toSettings(rawSettings));
+}
+
+function updateSettingsImmediately() {
+  const rawSettings = {
+    ...readSettingsForm(),
+  };
+
+  if (!validateSettings(rawSettings)) {
+    setSettingsMessage("選択肢の中から設定してください。", "error");
+    return;
+  }
+
+  applySettings(toSettings(rawSettings), "設定を更新しました。");
 }
 
 function addTask(event) {
@@ -231,6 +325,7 @@ async function enableNotifications() {
 
 document.addEventListener("DOMContentLoaded", () => {
   settings = repository.loadSettings();
+  applyTheme(settings.theme);
   const stats = repository.loadStats();
   state = { ...createInitialState(settings), ...stats, remainingSeconds: settings.focus.durationSeconds };
   tasks = repository.loadTasks();
@@ -241,15 +336,28 @@ document.addEventListener("DOMContentLoaded", () => {
     "#short-break-input": settings.shortBreak.durationSeconds / 60,
     "#long-break-input": settings.longBreak.durationSeconds / 60,
     "#long-break-interval-input": settings.longBreakInterval,
+    "#theme-input": settings.theme,
   };
   Object.entries(settingValues).forEach(([selector, value]) => {
     const input = document.querySelector(selector);
     if (input) input.value = String(value);
   });
+  const soundValues = {
+    "#start-sound-input": settings.sounds.start,
+    "#end-sound-input": settings.sounds.end,
+    "#tick-sound-input": settings.sounds.tick,
+  };
+  Object.entries(soundValues).forEach(([selector, value]) => {
+    const input = document.querySelector(selector);
+    if (input) input.checked = value;
+  });
 
   document.querySelector("#start-button")?.addEventListener("click", toggleTimer);
   document.querySelector("#reset-button")?.addEventListener("click", resetCurrentTimer);
   document.querySelector("#save-settings-button")?.addEventListener("click", saveSettings);
+  document.querySelectorAll("[data-setting-control]").forEach((control) => {
+    control.addEventListener("change", updateSettingsImmediately);
+  });
   document.querySelector("#task-form")?.addEventListener("submit", addTask);
   document.querySelector("#notification-button")?.addEventListener("click", enableNotifications);
   document.querySelectorAll("[data-mode]").forEach((button) => {

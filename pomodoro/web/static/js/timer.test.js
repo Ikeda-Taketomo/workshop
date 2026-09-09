@@ -109,7 +109,36 @@ test("completeSession advances to a long break on the configured interval", () =
 });
 
 test("validateSettings accepts values in range and rejects invalid values", () => {
-  assert.equal(validateSettings({ focus: 25, shortBreak: 5, longBreak: 15, longBreakInterval: 4 }), true);
-  assert.equal(validateSettings({ focus: 0, shortBreak: 5, longBreak: 15, longBreakInterval: 4 }), false);
-  assert.equal(validateSettings({ focus: 25.5, shortBreak: 5, longBreak: 15, longBreakInterval: 4 }), false);
+  assert.equal(validateSettings({
+    focus: 25,
+    shortBreak: 5,
+    longBreak: 15,
+    longBreakInterval: 4,
+    theme: "dark",
+    sounds: { start: true, end: false, tick: true },
+  }), true);
+  assert.equal(validateSettings({
+    focus: 20,
+    shortBreak: 5,
+    longBreak: 15,
+    longBreakInterval: 4,
+    theme: "dark",
+    sounds: { start: true, end: false, tick: true },
+  }), false);
+  assert.equal(validateSettings({
+    focus: 25,
+    shortBreak: 5,
+    longBreak: 15,
+    longBreakInterval: 4,
+    theme: "sepia",
+    sounds: { start: true, end: false, tick: true },
+  }), false);
+  assert.equal(validateSettings({
+    focus: 25,
+    shortBreak: 5,
+    longBreak: 15,
+    longBreakInterval: 4,
+    theme: "light",
+    sounds: { start: true, end: "no", tick: true },
+  }), false);
 });

@@ -55,14 +55,48 @@
       <details class="settings-panel">
         <summary>設定</summary>
         <div class="settings-grid">
-          <label>作業時間（分）<input id="focus-duration-input" type="number" min="1" max="180" value="25"></label>
-          <label>短い休憩（分）<input id="short-break-input" type="number" min="1" max="60" value="5"></label>
-          <label>長い休憩（分）<input id="long-break-input" type="number" min="1" max="60" value="15"></label>
-          <label>長い休憩まで<input id="long-break-interval-input" type="number" min="1" max="12" value="4"></label>
+          <label>集中時間
+            <select id="focus-duration-input" data-setting-control>
+              <option value="15">15分</option>
+              <option value="25" selected>25分</option>
+              <option value="35">35分</option>
+              <option value="45">45分</option>
+            </select>
+          </label>
+          <label>短い休憩
+            <select id="short-break-input" data-setting-control>
+              <option value="5" selected>5分</option>
+              <option value="10">10分</option>
+              <option value="15">15分</option>
+            </select>
+          </label>
+          <label>長い休憩
+            <select id="long-break-input" data-setting-control>
+              <option value="5">5分</option>
+              <option value="10">10分</option>
+              <option value="15" selected>15分</option>
+            </select>
+          </label>
+          <label>テーマ
+            <select id="theme-input" data-setting-control>
+              <option value="light" selected>ライト</option>
+              <option value="dark">ダーク</option>
+              <option value="focus">フォーカスモード</option>
+            </select>
+          </label>
+          <label>長い休憩まで<input id="long-break-interval-input" type="number" min="1" max="12" value="4" data-setting-control></label>
+        </div>
+        <fieldset class="sound-settings">
+          <legend>サウンド</legend>
+          <label><input id="start-sound-input" type="checkbox" checked data-setting-control>開始音</label>
+          <label><input id="end-sound-input" type="checkbox" checked data-setting-control>終了音</label>
+          <label><input id="tick-sound-input" type="checkbox" data-setting-control>tick 音</label>
+        </fieldset>
+        <div class="settings-actions">
+          <button id="save-settings-button" class="button button-secondary" type="button">設定を保存</button>
+          <button id="notification-button" class="button button-secondary" type="button">通知を有効化</button>
         </div>
         <p id="settings-error" class="settings-error" role="alert"></p>
-        <button id="save-settings-button" class="button button-secondary" type="button">設定を保存</button>
-        <button id="notification-button" class="button button-secondary" type="button">通知を有効化</button>
       </details>
 
       <section class="task-panel" aria-labelledby="task-title">

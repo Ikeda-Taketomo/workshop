@@ -13,6 +13,9 @@ test("UI contains the timer controls and progress areas", () => {
     'id="reset-button"',
     'id="completed-count"',
     'id="focus-duration"',
+    'id="theme-input"',
+    'id="start-sound-input"',
+    'id="tick-sound-input"',
   ]) {
     assert.match(html, new RegExp(selector));
   }
@@ -25,6 +28,21 @@ test("UI includes accessible status and mode controls", () => {
   assert.match(html, /data-mode="longBreak"/);
 });
 
+test("UI exposes customization options for durations, themes, and sounds", () => {
+  for (const expected of [
+    'option value="15"',
+    'option value="25"',
+    'option value="35"',
+    'option value="45"',
+    ">ダーク<",
+    ">ライト<",
+    ">フォーカスモード<",
+    'id="end-sound-input"',
+  ]) {
+    assert.match(html, new RegExp(expected));
+  }
+});
+
 test("styles define the timer ring and responsive layout", () => {
   assert.match(css, /conic-gradient/);
   assert.match(css, /@property --progress/);
@@ -33,5 +51,7 @@ test("styles define the timer ring and responsive layout", () => {
   assert.match(css, /\.app-shell\.is-focus-running::before/);
   assert.doesNotMatch(css, /\.app-shell\.is-focus::before/);
   assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.match(css, /:root\[data-theme="dark"\]/);
+  assert.match(css, /\.sound-settings/);
   assert.match(css, /@media \(max-width: 480px\)/);
 });
