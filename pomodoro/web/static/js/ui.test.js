@@ -27,5 +27,9 @@ test("UI includes accessible status and mode controls", () => {
 
 test("styles define the timer ring and responsive layout", () => {
   assert.match(css, /conic-gradient/);
+  assert.match(css, /@property --progress/);
+  assert.match(css, /@property --timer-hue/);
+  assert.match(css, /@keyframes ambient-wave/);
+  assert.match(css, /\.app-shell\.is-focus-running::before/);
   assert.match(css, /@media \(max-width: 480px\)/);
 });
