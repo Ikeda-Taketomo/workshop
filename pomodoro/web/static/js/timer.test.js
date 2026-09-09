@@ -1,8 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  calculateProgressDegrees,
   DEFAULT_SETTINGS,
   calculateRemainingSeconds,
+  calculateTimerHue,
   completeSession,
   createInitialState,
   formatSeconds,
@@ -25,6 +27,20 @@ test("formatSeconds returns a zero-padded minute and second value", () => {
   assert.equal(formatSeconds(1500), "25:00");
   assert.equal(formatSeconds(65), "01:05");
   assert.equal(formatSeconds(-1), "00:00");
+});
+
+test("calculateProgressDegrees returns the remaining arc of the timer ring", () => {
+  assert.equal(calculateProgressDegrees(1500, 1500), 360);
+  assert.equal(calculateProgressDegrees(750, 1500), 180);
+  assert.equal(calculateProgressDegrees(-10, 1500), 0);
+});
+
+test("calculateTimerHue shifts from blue to yellow to red over time", () => {
+  assert.equal(calculateTimerHue(1500, 1500), 210);
+  assert.equal(calculateTimerHue(1125, 1500), 130);
+  assert.equal(calculateTimerHue(750, 1500), 50);
+  assert.equal(calculateTimerHue(375, 1500), 28);
+  assert.equal(calculateTimerHue(0, 1500), 6);
 });
 
 test("startTimer marks the timer as running at the supplied time", () => {

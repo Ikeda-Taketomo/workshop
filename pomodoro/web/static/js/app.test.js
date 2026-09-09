@@ -15,6 +15,8 @@ test("app renders modes, progress, and automatic session completion", () => {
   assert.match(app, /data-mode/);
   assert.match(app, /#completed-count/);
   assert.match(app, /completeSession/);
+  assert.match(app, /calculateProgressDegrees/);
+  assert.match(app, /calculateTimerHue/);
   assert.match(app, /setInterval\(tick,\s*1000\)/);
 });
 
@@ -33,4 +35,9 @@ test("app connects persistence, settings, tasks, history, and notifications", ()
   ]) {
     assert.match(app, new RegExp(expected.replace(/[.]/g, "\\.")));
   }
+});
+
+test("app only toggles the focus ambience class while the focus timer is running", () => {
+  assert.match(app, /is-focus-running/);
+  assert.doesNotMatch(app, /classList\.toggle\("is-focus"/);
 });

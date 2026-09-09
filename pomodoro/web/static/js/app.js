@@ -1,6 +1,8 @@
 import {
   DEFAULT_SETTINGS,
+  calculateProgressDegrees,
   calculateRemainingSeconds,
+  calculateTimerHue,
   completeSession,
   createInitialState,
   formatSeconds,
@@ -82,9 +84,8 @@ function getRemainingSeconds(nowMs = Date.now()) {
 function updateTimerRing(remainingSeconds) {
   const ring = document.querySelector("#timer-ring");
   const duration = settings[state.mode].durationSeconds;
-  const progress = duration === 0 ? 0 : (1 - remainingSeconds / duration) * 360;
-
-  ring?.style.setProperty("--progress", `${Math.max(0, Math.min(360, progress))}deg`);
+  ring?.style.setProperty("--progress", `${calculateProgressDegrees(remainingSeconds, duration)}deg`);
+  ring?.style.setProperty("--timer-hue", String(calculateTimerHue(remainingSeconds, duration)));
 }
 
 function render() {
@@ -97,6 +98,7 @@ function render() {
   const focusDuration = document.querySelector("#focus-duration");
   const taskList = document.querySelector("#task-list");
   const historyList = document.querySelector("#session-history");
+  const appShell = document.querySelector(".app-shell");
 
   if (timerDisplay) timerDisplay.textContent = formatSeconds(remainingSeconds);
   if (modeLabel) modeLabel.textContent = MODE_LABELS[state.mode];
@@ -112,6 +114,7 @@ function render() {
     button.classList.toggle("is-active", button.dataset.mode === state.mode);
     button.disabled = state.isRunning;
   });
+  appShell?.classList.toggle("is-focus-running", state.mode === "focus" && state.isRunning);
   updateTimerRing(remainingSeconds);
   renderTasks(taskList);
   renderHistory(historyList);

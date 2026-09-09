@@ -45,6 +45,12 @@ test("UI exposes customization options for durations, themes, and sounds", () =>
 
 test("styles define the timer ring and responsive layout", () => {
   assert.match(css, /conic-gradient/);
+  assert.match(css, /@property --progress/);
+  assert.match(css, /@property --timer-hue/);
+  assert.match(css, /@keyframes ambient-wave/);
+  assert.match(css, /\.app-shell\.is-focus-running::before/);
+  assert.doesNotMatch(css, /\.app-shell\.is-focus::before/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
   assert.match(css, /:root\[data-theme="dark"\]/);
   assert.match(css, /\.sound-settings/);
   assert.match(css, /@media \(max-width: 480px\)/);

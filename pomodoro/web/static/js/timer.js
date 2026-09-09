@@ -40,6 +40,30 @@ export function formatSeconds(totalSeconds) {
   return `${minutesPart}:${secondsPart}`;
 }
 
+export function calculateProgressDegrees(remainingSeconds, durationSeconds) {
+  if (durationSeconds <= 0) {
+    return 0;
+  }
+
+  const clampedRemainingSeconds = Math.max(0, Math.min(durationSeconds, remainingSeconds));
+  return (clampedRemainingSeconds / durationSeconds) * 360;
+}
+
+export function calculateTimerHue(remainingSeconds, durationSeconds) {
+  if (durationSeconds <= 0) {
+    return 6;
+  }
+
+  const clampedRemainingSeconds = Math.max(0, Math.min(durationSeconds, remainingSeconds));
+  const elapsedRatio = 1 - (clampedRemainingSeconds / durationSeconds);
+
+  if (elapsedRatio <= 0.5) {
+    return Math.round(210 - (160 * (elapsedRatio / 0.5)));
+  }
+
+  return Math.round(50 - (44 * ((elapsedRatio - 0.5) / 0.5)));
+}
+
 export function startTimer(state, nowMs) {
   return {
     ...state,
