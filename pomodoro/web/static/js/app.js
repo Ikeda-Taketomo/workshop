@@ -10,6 +10,7 @@ import {
   startTimer,
   validateSettings,
 } from "./timer.js";
+import { compareAchievements, summarizeGamification } from "./gamification.js";
 import { createStorageRepository } from "./storage.js";
 
 const MODE_LABELS = {
@@ -24,7 +25,28 @@ let state = createInitialState(settings);
 let intervalId = null;
 let tasks = [];
 let history = [];
+let activityLog = [];
 let activeTaskId = null;
+let feedbackTimeoutId = null;
+
+function getGamificationSummary() {
+  return summarizeGamification(history, activityLog, new Date());
+}
+
+function showAchievementFeedback(feedback) {
+  const container = document.querySelector("#achievement-feedback");
+  if (!container || !feedback) return;
+
+  container.hidden = false;
+  container.textContent = feedback.message;
+  container.dataset.kind = feedback.type;
+  window.clearTimeout(feedbackTimeoutId);
+  feedbackTimeoutId = window.setTimeout(() => {
+    container.hidden = true;
+    container.textContent = "";
+    delete container.dataset.kind;
+  }, 3600);
+}
 
 function getRemainingSeconds(nowMs = Date.now()) {
   if (!state.isRunning || state.startedAtMs === null) {
@@ -52,6 +74,7 @@ function render() {
   const focusDuration = document.querySelector("#focus-duration");
   const taskList = document.querySelector("#task-list");
   const historyList = document.querySelector("#session-history");
+  const summary = getGamificationSummary();
 
   if (timerDisplay) timerDisplay.textContent = formatSeconds(remainingSeconds);
   if (modeLabel) modeLabel.textContent = MODE_LABELS[state.mode];
@@ -68,8 +91,57 @@ function render() {
     button.disabled = state.isRunning;
   });
   updateTimerRing(remainingSeconds);
+  renderGamification(summary);
   renderTasks(taskList);
   renderHistory(historyList);
+}
+
+function renderGamification(summary) {
+  const xpValue = document.querySelector("#xp-value");
+  const levelValue = document.querySelector("#level-value");
+  const streakValue = document.querySelector("#streak-value");
+  const levelProgressBar = document.querySelector("#level-progress-bar");
+  const levelProgressText = document.querySelector("#level-progress-text");
+  const badgeList = document.querySelector("#badge-list");
+  const weeklyCompleted = document.querySelector("#weekly-completed");
+  const weeklyRate = document.querySelector("#weekly-rate");
+  const weeklyAverage = document.querySelector("#weekly-average");
+  const monthlyCompleted = document.querySelector("#monthly-completed");
+  const monthlyRate = document.querySelector("#monthly-rate");
+  const monthlyAverage = document.querySelector("#monthly-average");
+
+  if (xpValue) xpValue.textContent = `${summary.xp} XP`;
+  if (levelValue) levelValue.textContent = String(summary.level.level);
+  if (streakValue) streakValue.textContent = `${summary.streakDays}日`;
+  if (levelProgressBar) levelProgressBar.style.width = `${summary.level.progressPercent}%`;
+  if (levelProgressText) {
+    levelProgressText.textContent = `次のレベルまであと${summary.level.xpToNextLevel} XP`;
+  }
+  if (weeklyCompleted) weeklyCompleted.textContent = `${summary.weekly.completedCount}回`;
+  if (weeklyRate) weeklyRate.textContent = `${summary.weekly.completionRate}%`;
+  if (weeklyAverage) weeklyAverage.textContent = `${summary.weekly.averageFocusMinutes}分`;
+  if (monthlyCompleted) monthlyCompleted.textContent = `${summary.monthly.completedCount}回`;
+  if (monthlyRate) monthlyRate.textContent = `${summary.monthly.completionRate}%`;
+  if (monthlyAverage) monthlyAverage.textContent = `${summary.monthly.averageFocusMinutes}分`;
+
+  if (!badgeList) return;
+  badgeList.replaceChildren();
+  summary.badges.forEach((badge) => {
+    const item = document.createElement("li");
+    item.className = "badge-item";
+    const title = document.createElement("strong");
+    title.textContent = badge.label;
+    const description = document.createElement("span");
+    description.textContent = badge.description;
+    item.append(title, description);
+    badgeList.append(item);
+  });
+  if (summary.badges.length === 0) {
+    const item = document.createElement("li");
+    item.className = "badge-item badge-item-empty";
+    item.textContent = "まだバッジはありません";
+    badgeList.append(item);
+  }
 }
 
 function renderTasks(taskList) {
@@ -143,16 +215,20 @@ function tick() {
 
   stopInterval();
   const completedMode = state.mode;
+  const previousSummary = getGamificationSummary();
   state = completeSession({ ...state, remainingSeconds: 0 }, settings);
   history.push({
     id: `session-${Date.now()}`,
     mode: completedMode,
     durationMinutes: Math.floor(settings[completedMode].durationSeconds / 60),
+    durationSeconds: settings[completedMode].durationSeconds,
     completedAt: new Date().toISOString(),
     taskId: activeTaskId,
   });
   repository.saveHistory(history);
   persistState();
+  const nextSummary = getGamificationSummary();
+  showAchievementFeedback(compareAchievements(previousSummary, nextSummary));
   notifyCompletion(completedMode);
   render();
 }
@@ -162,6 +238,14 @@ function toggleTimer() {
     state = pauseTimer(state, Date.now());
     stopInterval();
   } else {
+    if (state.mode === "focus" && state.remainingSeconds === settings.focus.durationSeconds) {
+      activityLog.push({
+        id: `attempt-${Date.now()}`,
+        mode: "focus",
+        startedAt: new Date().toISOString(),
+      });
+      repository.saveActivityLog(activityLog);
+    }
     state = startTimer(state, Date.now());
     stopInterval();
     intervalId = window.setInterval(tick, 1000);
@@ -232,6 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
   state = { ...createInitialState(settings), ...stats, remainingSeconds: settings.focus.durationSeconds };
   tasks = repository.loadTasks();
   history = repository.loadHistory();
+  activityLog = repository.loadActivityLog();
 
   const settingValues = {
     "#focus-duration-input": settings.focus.durationSeconds / 60,

@@ -52,6 +52,61 @@
         </div>
       </section>
 
+      <section class="gamification-panel" aria-labelledby="gamification-title">
+        <div id="achievement-feedback" class="achievement-feedback" hidden></div>
+        <div class="gamification-header">
+          <div>
+            <h2 id="gamification-title">継続の記録</h2>
+            <p class="gamification-caption">XP・レベル・バッジで継続を見える化</p>
+          </div>
+          <div class="level-chip">
+            <span>Lv.</span>
+            <strong id="level-value">1</strong>
+          </div>
+        </div>
+        <div class="gamification-metrics">
+          <div class="metric-card">
+            <strong id="xp-value">0 XP</strong>
+            <span>経験値</span>
+          </div>
+          <div class="metric-card">
+            <strong id="streak-value">0日</strong>
+            <span>ストリーク</span>
+          </div>
+        </div>
+        <div class="level-progress" aria-label="レベル進捗">
+          <div id="level-progress-bar" class="level-progress-bar" style="width: 0%;"></div>
+        </div>
+        <p id="level-progress-text" class="level-progress-text">次のレベルまであと100 XP</p>
+
+        <section class="badge-panel" aria-labelledby="badge-title">
+          <h3 id="badge-title">達成バッジ</h3>
+          <ul id="badge-list" class="badge-list"></ul>
+        </section>
+
+        <section class="stats-panel" aria-labelledby="stats-title">
+          <h3 id="stats-title">統計</h3>
+          <div class="stats-grid">
+            <article class="stats-card" aria-labelledby="weekly-stats-title">
+              <h4 id="weekly-stats-title">週間</h4>
+              <dl>
+                <div><dt>完了回数</dt><dd id="weekly-completed">0回</dd></div>
+                <div><dt>完了率</dt><dd id="weekly-rate">0%</dd></div>
+                <div><dt>平均集中時間</dt><dd id="weekly-average">0分</dd></div>
+              </dl>
+            </article>
+            <article class="stats-card" aria-labelledby="monthly-stats-title">
+              <h4 id="monthly-stats-title">月間</h4>
+              <dl>
+                <div><dt>完了回数</dt><dd id="monthly-completed">0回</dd></div>
+                <div><dt>完了率</dt><dd id="monthly-rate">0%</dd></div>
+                <div><dt>平均集中時間</dt><dd id="monthly-average">0分</dd></div>
+              </dl>
+            </article>
+          </div>
+        </section>
+      </section>
+
       <details class="settings-panel">
         <summary>設定</summary>
         <div class="settings-grid">

@@ -5,6 +5,7 @@ const KEYS = Object.freeze({
   stats: "pomodoro.stats",
   tasks: "pomodoro.tasks",
   history: "pomodoro.history",
+  activity: "pomodoro.activity",
 });
 
 const defaultStats = Object.freeze({
@@ -71,6 +72,13 @@ export function createStorageRepository(storage) {
     },
     saveHistory(history) {
       storage.setItem(KEYS.history, JSON.stringify(history));
+    },
+    loadActivityLog() {
+      const activity = readJson(storage, KEYS.activity, []);
+      return Array.isArray(activity) ? activity : [];
+    },
+    saveActivityLog(activity) {
+      storage.setItem(KEYS.activity, JSON.stringify(activity));
     },
   };
 }

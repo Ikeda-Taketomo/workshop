@@ -11,18 +11,23 @@ test("app connects the main timer controls", () => {
   assert.match(app, /resetCurrentTimer/);
 });
 
-test("app renders modes, progress, and automatic session completion", () => {
+test("app renders modes, progress, gamification, and automatic session completion", () => {
   assert.match(app, /data-mode/);
   assert.match(app, /#completed-count/);
+  assert.match(app, /#xp-value/);
+  assert.match(app, /#streak-value/);
+  assert.match(app, /summarizeGamification/);
   assert.match(app, /completeSession/);
   assert.match(app, /setInterval\(tick,\s*1000\)/);
 });
 
-test("app connects persistence, settings, tasks, history, and notifications", () => {
+test("app connects persistence, settings, tasks, history, activity logs, and notifications", () => {
   for (const expected of [
     "createStorageRepository",
     "saveSettings",
     "loadSettings",
+    "saveActivityLog",
+    "loadActivityLog",
     "task-form",
     "session-history",
     "Notification.requestPermission",
