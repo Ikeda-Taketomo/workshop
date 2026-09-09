@@ -27,6 +27,12 @@ function settingsToMinutes(settings) {
     shortBreak: Math.floor(settings.shortBreak.durationSeconds / 60),
     longBreak: Math.floor(settings.longBreak.durationSeconds / 60),
     longBreakInterval: settings.longBreakInterval,
+    theme: settings.theme,
+    sounds: {
+      start: settings.sounds.start,
+      end: settings.sounds.end,
+      tick: settings.sounds.tick,
+    },
   };
 }
 
@@ -36,6 +42,31 @@ function minutesToSettings(minutes) {
     shortBreak: { durationSeconds: minutes.shortBreak * 60 },
     longBreak: { durationSeconds: minutes.longBreak * 60 },
     longBreakInterval: minutes.longBreakInterval,
+    theme: minutes.theme,
+    sounds: {
+      start: minutes.sounds.start,
+      end: minutes.sounds.end,
+      tick: minutes.sounds.tick,
+    },
+  };
+}
+
+function normalizeSavedSettings(saved) {
+  if (!saved || typeof saved !== "object") {
+    return null;
+  }
+
+  return {
+    focus: Number(saved.focus),
+    shortBreak: Number(saved.shortBreak),
+    longBreak: Number(saved.longBreak),
+    longBreakInterval: Number(saved.longBreakInterval),
+    theme: typeof saved.theme === "string" ? saved.theme : DEFAULT_SETTINGS.theme,
+    sounds: {
+      start: typeof saved.sounds?.start === "boolean" ? saved.sounds.start : DEFAULT_SETTINGS.sounds.start,
+      end: typeof saved.sounds?.end === "boolean" ? saved.sounds.end : DEFAULT_SETTINGS.sounds.end,
+      tick: typeof saved.sounds?.tick === "boolean" ? saved.sounds.tick : DEFAULT_SETTINGS.sounds.tick,
+    },
   };
 }
 
@@ -43,7 +74,8 @@ export function createStorageRepository(storage) {
   return {
     loadSettings() {
       const saved = readJson(storage, KEYS.settings, null);
-      return saved && validateSettings(saved) ? minutesToSettings(saved) : DEFAULT_SETTINGS;
+      const normalized = normalizeSavedSettings(saved);
+      return normalized && validateSettings(normalized) ? minutesToSettings(normalized) : DEFAULT_SETTINGS;
     },
     saveSettings(settings) {
       storage.setItem(KEYS.settings, JSON.stringify(settingsToMinutes(settings)));
