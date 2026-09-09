@@ -14,15 +14,30 @@ function createFakeStorage(initial = {}) {
 test("storage saves and loads timer settings", () => {
   const repository = createStorageRepository(createFakeStorage());
   const settings = {
-    focus: { durationSeconds: 30 * 60 },
+    focus: { durationSeconds: 35 * 60 },
     shortBreak: { durationSeconds: 10 * 60 },
-    longBreak: { durationSeconds: 20 * 60 },
+    longBreak: { durationSeconds: 15 * 60 },
     longBreakInterval: 3,
+    theme: "focus",
+    sounds: { start: false, end: true, tick: true },
   };
 
   repository.saveSettings(settings);
 
   assert.deepEqual(repository.loadSettings(), settings);
+});
+
+test("storage fills in new defaults for legacy saved settings", () => {
+  const repository = createStorageRepository(createFakeStorage({
+    "pomodoro.settings": JSON.stringify({
+      focus: 25,
+      shortBreak: 5,
+      longBreak: 15,
+      longBreakInterval: 4,
+    }),
+  }));
+
+  assert.deepEqual(repository.loadSettings(), DEFAULT_SETTINGS);
 });
 
 test("storage falls back to defaults for invalid or corrupt settings", () => {

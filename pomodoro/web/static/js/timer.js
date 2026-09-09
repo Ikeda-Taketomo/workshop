@@ -1,8 +1,18 @@
+export const FOCUS_DURATION_OPTIONS = Object.freeze([15, 25, 35, 45]);
+export const BREAK_DURATION_OPTIONS = Object.freeze([5, 10, 15]);
+export const THEMES = Object.freeze(["light", "dark", "focus"]);
+
 export const DEFAULT_SETTINGS = Object.freeze({
   focus: { durationSeconds: 25 * 60 },
   shortBreak: { durationSeconds: 5 * 60 },
   longBreak: { durationSeconds: 15 * 60 },
   longBreakInterval: 4,
+  theme: "light",
+  sounds: Object.freeze({
+    start: true,
+    end: true,
+    tick: false,
+  }),
 });
 
 export const MODES = Object.freeze(["focus", "shortBreak", "longBreak"]);
@@ -109,20 +119,27 @@ export function validateSettings(rawSettings) {
     longBreak: Number(rawSettings.longBreak),
     longBreakInterval: Number(rawSettings.longBreakInterval),
   };
+  const sounds = rawSettings.sounds ?? {};
 
-  const ranges = {
-    focus: [1, 180],
-    shortBreak: [1, 60],
-    longBreak: [1, 60],
-    longBreakInterval: [1, 12],
-  };
-
-  for (const [key, value] of Object.entries(values)) {
-    const [minimum, maximum] = ranges[key];
-    if (!Number.isInteger(value) || value < minimum || value > maximum) {
-      return false;
-    }
+  if (!FOCUS_DURATION_OPTIONS.includes(values.focus)) {
+    return false;
   }
 
-  return true;
+  if (!BREAK_DURATION_OPTIONS.includes(values.shortBreak)) {
+    return false;
+  }
+
+  if (!BREAK_DURATION_OPTIONS.includes(values.longBreak)) {
+    return false;
+  }
+
+  if (!Number.isInteger(values.longBreakInterval) || values.longBreakInterval < 1 || values.longBreakInterval > 12) {
+    return false;
+  }
+
+  if (!THEMES.includes(rawSettings.theme)) {
+    return false;
+  }
+
+  return ["start", "end", "tick"].every((key) => typeof sounds[key] === "boolean");
 }

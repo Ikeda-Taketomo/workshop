@@ -1,14 +1,72 @@
 :root {
-  color-scheme: light;
   font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
+  color-scheme: light;
   color: #303039;
   background: #6e63c5;
+  --page-background: linear-gradient(145deg, #7568cf 0%, #5e54b0 100%);
+  --card-background: #fbfaff;
+  --card-shadow: 0 24px 50px rgb(47 38 113 / 25%);
+  --text-color: #303039;
+  --muted-color: #777481;
+  --accent-color: #6d5ac3;
+  --accent-strong-color: #7474e8;
+  --accent-text-color: #4b45ae;
+  --panel-background: #eeeefe;
+  --border-color: #e4e2ec;
+  --input-border-color: #d9d7e4;
+  --track-color: #e9e9ed;
+  --face-background: #fbfaff;
+  --window-control-color: #6d6a77;
+  --metric-color: #6d78e0;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #f4f3f8;
+  background: #19172b;
+  --page-background: linear-gradient(145deg, #242038 0%, #171427 100%);
+  --card-background: #221f36;
+  --card-shadow: 0 24px 50px rgb(0 0 0 / 35%);
+  --text-color: #f4f3f8;
+  --muted-color: #c7c2dc;
+  --accent-color: #9186ff;
+  --accent-strong-color: #7d75ed;
+  --accent-text-color: #d9d6ff;
+  --panel-background: #2b2743;
+  --border-color: #40395d;
+  --input-border-color: #4d4669;
+  --track-color: #3a3552;
+  --face-background: #221f36;
+  --window-control-color: #d0cbe3;
+  --metric-color: #beb8ff;
+}
+
+:root[data-theme="focus"] {
+  color-scheme: light;
+  color: #1f1f23;
+  background: #e7e3db;
+  --page-background: linear-gradient(180deg, #f3efe7 0%, #e2ddd4 100%);
+  --card-background: #fffdfa;
+  --card-shadow: 0 12px 24px rgb(41 35 25 / 8%);
+  --text-color: #1f1f23;
+  --muted-color: #686356;
+  --accent-color: #4b5a47;
+  --accent-strong-color: #677a63;
+  --accent-text-color: #334030;
+  --panel-background: #f4efe5;
+  --border-color: #d9d2c5;
+  --input-border-color: #cfc8bc;
+  --track-color: #e6e0d6;
+  --face-background: #fffdfa;
+  --window-control-color: #7f796c;
+  --metric-color: #4b5a47;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(145deg, #7568cf 0%, #5e54b0 100%);
+  color: var(--text-color);
+  background: var(--page-background);
 }
 
 .app-shell {
@@ -24,8 +82,8 @@ body {
   padding: 2rem;
   box-sizing: border-box;
   border-radius: 22px;
-  background: #fbfaff;
-  box-shadow: 0 24px 50px rgb(47 38 113 / 25%);
+  background: var(--card-background);
+  box-shadow: var(--card-shadow);
 }
 
 .window-header,
@@ -75,7 +133,7 @@ button {
   border: 0;
   padding: 0;
   background: transparent;
-  color: #6d6a77;
+  color: var(--window-control-color);
   font-size: 1rem;
 }
 
@@ -91,12 +149,12 @@ button {
   border-bottom: 2px solid transparent;
   padding: 0.5rem 0.75rem;
   background: transparent;
-  color: #777481;
+  color: var(--muted-color);
 }
 
 .mode-tab.is-active {
-  border-bottom-color: #7068df;
-  color: #4b45ae;
+  border-bottom-color: var(--accent-strong-color);
+  color: var(--accent-text-color);
   font-weight: 700;
 }
 
@@ -107,7 +165,7 @@ button {
 
 .mode-label {
   margin-bottom: 1.25rem;
-  color: #777481;
+  color: var(--muted-color);
 }
 
 .timer-ring {
@@ -116,7 +174,7 @@ button {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: conic-gradient(#7474e8 var(--progress), #e9e9ed 0);
+  background: conic-gradient(var(--accent-strong-color) var(--progress), var(--track-color) 0);
 }
 
 .timer-face {
@@ -125,7 +183,7 @@ button {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #fbfaff;
+  background: var(--face-background);
 }
 
 .timer-display {
@@ -149,14 +207,14 @@ button {
 
 .button-primary {
   border: 0;
-  background: #6d5ac3;
+  background: var(--accent-color);
   color: white;
 }
 
 .button-secondary {
-  border: 2px solid #7474e8;
+  border: 2px solid var(--accent-strong-color);
   background: transparent;
-  color: #5e5bc4;
+  color: var(--accent-color);
 }
 
 .progress-panel,
@@ -169,7 +227,7 @@ button {
 .progress-panel {
   padding: 1.25rem;
   border-radius: 14px;
-  background: #eeeefe;
+  background: var(--panel-background);
 }
 
 .progress-metrics {
@@ -184,18 +242,18 @@ button {
 }
 
 .progress-metrics strong {
-  color: #6d78e0;
+  color: var(--metric-color);
   font-size: 1.6rem;
 }
 
 .progress-metrics span {
   margin-top: 0.25rem;
-  color: #777481;
+  color: var(--muted-color);
   font-size: 0.8rem;
 }
 
 .settings-panel {
-  border-top: 1px solid #e4e2ec;
+  border-top: 1px solid var(--border-color);
   padding-top: 1rem;
 }
 
@@ -218,19 +276,52 @@ button {
 }
 
 .settings-grid input,
+.settings-grid select,
 .task-form input {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #d9d7e4;
+  border: 1px solid var(--input-border-color);
   border-radius: 8px;
   padding: 0.6rem;
-  background: white;
+  background: var(--face-background);
+  color: var(--text-color);
+}
+
+.sound-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+}
+
+.sound-settings legend {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.sound-settings label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .settings-error {
   min-height: 1.3rem;
   color: #b3364a;
   font-size: 0.8rem;
+}
+
+.settings-error[data-state="success"] {
+  color: var(--accent-color);
 }
 
 .task-form {
@@ -257,7 +348,7 @@ button {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.7rem;
-  border-bottom: 1px solid #e7e5ee;
+  border-bottom: 1px solid var(--border-color);
   font-size: 0.85rem;
 }
 
@@ -269,7 +360,11 @@ button {
 .task-item button {
   border: 0;
   background: transparent;
-  color: #625cc4;
+  color: var(--accent-color);
+}
+
+:root[data-theme="focus"] .window-controls {
+  display: none;
 }
 
 .sr-only {
