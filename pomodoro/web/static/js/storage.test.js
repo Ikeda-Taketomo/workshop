@@ -33,17 +33,20 @@ test("storage falls back to defaults for invalid or corrupt settings", () => {
   assert.deepEqual(repository.loadSettings(), DEFAULT_SETTINGS);
 });
 
-test("storage saves stats, tasks, and history", () => {
+test("storage saves stats, tasks, history, and activity logs", () => {
   const repository = createStorageRepository(createFakeStorage());
   const stats = { completedFocusCount: 2, totalFocusSeconds: 3000 };
   const tasks = [{ id: "task-1", title: "設計" }];
   const history = [{ id: "session-1", mode: "focus" }];
+  const activity = [{ id: "attempt-1", mode: "focus", startedAt: "2026-09-09T00:00:00.000Z" }];
 
   repository.saveStats(stats);
   repository.saveTasks(tasks);
   repository.saveHistory(history);
+  repository.saveActivityLog(activity);
 
   assert.deepEqual(repository.loadStats(), stats);
   assert.deepEqual(repository.loadTasks(), tasks);
   assert.deepEqual(repository.loadHistory(), history);
+  assert.deepEqual(repository.loadActivityLog(), activity);
 });
